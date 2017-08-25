@@ -6,10 +6,12 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 public class ReadyListener extends ListenerAdapter {
     public void onReady(ReadyEvent event) {
-        for( Guild g: event.getJDA().getGuilds()) {
-            g.getTextChannels().get(1).sendMessage(
-                    "WyattMusicBot is ready."
-            ).queue();
-        }
+//
+//        for( Guild g: event.getJDA().getGuilds()) {
+//            g.getTextChannelsByName("bot_events", true ).get(0).sendMessage(
+//                    "WyattMusicBot is ready."
+//            ).queue();
+//        }
     }
-}
+    }
+

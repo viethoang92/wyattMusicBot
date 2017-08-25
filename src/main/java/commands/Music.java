@@ -112,10 +112,11 @@ public class Music implements Command{
     }
 
     private String buildQueueMesssage(AudioInfo info) {
+        //AudioTrackInfo trackInfo = info.getTrack().getInfo();
         AudioTrackInfo trackInfo = info.getTrack().getInfo();
         String title = trackInfo.title;
         long length = trackInfo.length;
-        return "'[ " + getTimestamp(length) + " ]'" + title + "\n";
+        return "\n" + "[" + getTimestamp(length) + "] " + title;
     }
 
     private void sendErrorMsg(MessageReceivedEvent event, String content) {
@@ -143,91 +144,74 @@ public class Music implements Command{
         }
 
         switch(args[0].toLowerCase()) {
+
             case "play":
             case "p":
-
                 if (args.length < 2) {
                     sendErrorMsg(event, "Please enter a valid source!");
                     return;
                 }
-
                 String input = Arrays.stream(args).skip(1).map(s -> " " + s).collect(Collectors.joining()).substring(1);
-
                 if(!(input.startsWith("http://") || input.startsWith("https://"))){
                     input = "ytsearch: " + input;
                 }
-
-
                 loadTrack(input, event.getMember(), event.getMessage());
                 break;
 
             case "skip":
             case "s":
-
                 if(isIdle(guild)) return;
                 for (int i =  (args.length > 1 ? Integer.parseInt(args[1]) : 1); i == 1; i--) {
                     skip(guild);
                 }
+                break;
 
+            case "purge":
+            case "clear":
+                if(isIdle(guild)) return;
+                getManager(guild).purgeQueue();
                 break;
 
             case "stop":
-                if(isIdle(guild)) return;
-
                 getManager(guild).purgeQueue();
                 skip(guild);
                 guild.getAudioManager().closeAudioConnection();
-
                 break;
 
             case "shuffle":
                 if(isIdle(guild)) return;
-
                 getManager(guild).shuffleQueue();
-
                 break;
 
             case "now":
             case "info":
 
                 if(isIdle(guild)) return;
-
                 AudioTrack track = getPlayer(guild).getPlayingTrack();
                 AudioTrackInfo info = track.getInfo();
-
                 event.getTextChannel().sendMessage(
                         new EmbedBuilder()
                                 .setDescription("**CURRENT TRACK INFO:**")
                                 .addField("Title", info.title, false)
-                                .addField("Duration", "'[ " + getTimestamp(track.getPosition()) + "/ " + getTimestamp(track.getDuration()) + " ]'", false)
+                                .addField("Duration", "[" + getTimestamp(track.getPosition()) + "/ " + getTimestamp(track.getDuration()) + "]", false)
                                 .addField("Author", info.author, false)
                                 .build()
                 ).queue();
-
                 break;
 
             case "queue":
+            case "q":
                 if(isIdle(guild)) return;
-
-
-
                     int sideNumb = args.length > 1 ? Integer.parseInt(args[1]) : 1;
-
-
-
                 List<String> tracks = new ArrayList<>();
                 List<String> trackSublist;
-
                 getManager(guild).getQueue().forEach(audioInfo -> tracks.add(buildQueueMesssage(audioInfo)));
-
                 if(tracks.size() > 20)
                     trackSublist = tracks.subList((sideNumb-1)*20, (sideNumb-1)*20+20);
                 else
                     trackSublist = tracks;
-
                 String out = trackSublist.stream().collect(Collectors.joining("\n"));
                 int sideNumbAll = tracks.size() >= 20 ? tracks.size() / 20 : 1;
-
                 event.getTextChannel().sendMessage(
                         new EmbedBuilder()
                                 .setDescription("**CURRENT QUEUE:**\n" +
@@ -236,7 +220,6 @@ public class Music implements Command{
                                 )
                                 .build()
                 ).queue();
-
                 break;
         }
     }
