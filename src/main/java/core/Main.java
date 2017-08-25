@@ -8,8 +8,10 @@ import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.OnlineStatus;
+import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import util.SECRETS;
+import util.STATIC;
 
 import javax.security.auth.login.LoginException;
 
@@ -22,7 +24,21 @@ public class Main {
         builder.setToken(SECRETS.TOKEN);
         builder.setAutoReconnect(true);
 
-        builder.setStatus(OnlineStatus.DO_NOT_DISTURB);
+        builder.setStatus(OnlineStatus.ONLINE);
+        builder.setGame(new Game() {
+
+            public String getName() {
+                return "v." + STATIC.VERSION;
+            }
+
+            public String getUrl() {
+                return null;
+            }
+
+            public GameType getType() {
+                return GameType.DEFAULT;
+            }
+        });
 
         addListeners();
         addCommands();
